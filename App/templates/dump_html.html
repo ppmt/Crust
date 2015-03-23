@@ -1,0 +1,11 @@
+#Taken from the ingredients using a macro
+
+{% import 'macros.html' as macros %}
+
+{% call macros.render_form(form, action_url=url_for('ingredient'), action_text='Submit', class_='form-horizontal') %}
+    {% for ingredient in form.ingredient_list %}
+      {{ macros.render_field(ingredient.category, label_visible=true, placeholder='', type='') }}
+      {{ macros.render_field(ingredient.ingredient, label_visible=true, placeholder='', type='') }}
+      {{ macros.render_field(ingredient.supplier, label_visible=true, placeholder='', type='') }}
+    {% endfor %}
+{% endcall %}

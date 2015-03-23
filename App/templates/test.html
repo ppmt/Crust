@@ -1,0 +1,28 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+{% if form.errors %}
+{{ form.errors }}
+{% endif %}
+
+<form action="" method=post class=add-entry>
+{{ form.hidden_tag() }}
+{{ form.first_name.label }}: {{ form.first_name }} <br/>
+
+{{ form.last_name.label }}: {{ form.last_name }}<br/>
+
+{% for im_account in form.im_accounts %}
+
+  {{ im_account.protocol.label }}: {{ im_account.protocol }}
+  {{ im_account.username.label }}: {{ im_account.username }}
+
+{% endfor %}
+<input type=submit value=Share>
+</form>
+
+{{a}}
+
+{% endblock %}

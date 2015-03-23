@@ -1,0 +1,41 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block content %}
+
+<div class="container">
+
+  <form class="form form-vertical" method="post" role="form">
+    {{ form.hidden_tag() }}
+    <div class="repeatable">
+      <span class="add btn btn-success" id="add">Add Paragraph</span>
+      {{ wtf.form_field(form.paragraph) }}
+    </div>
+    {{ wtf.form_field(form.submit) }}
+  </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+
+  <script type="text/javascript">
+    jQuery(document).ready(
+      function()
+        {
+          var count = 4;
+          $('#add').click(
+            function()
+            {
+              count += 1
+              // numeric id #4 below corresponds to the paragraph input field.
+              $('#4').clone().appendTo('.repeatable').attr('id', count)
+            }
+            );
+        }
+        );
+  </script>
+
+{% endblock %}

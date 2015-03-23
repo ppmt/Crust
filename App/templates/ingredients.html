@@ -1,0 +1,40 @@
+<!-- extend base layout -->
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+
+<div class="container">
+
+  <form class="form form-horizontal" method="post" role="form">
+    {{ form.hidden_tag() }}
+    <div class="repeatable">
+      <span class="add btn btn-success" id="add">Add Ingredients</span>
+        {% for ingredient in form.ingredient_list %}
+          {{ wtf.form_field(ingredient.category) }}
+          {{ wtf.form_field(ingredient.ingredient) }}
+          {{ wtf.form_field(ingredient.supplier) }}
+        {% endfor %}
+    </div>
+    <input type=submit value={{ action }}>
+</form>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+
+<script type="text/javascript">
+jQuery(document).ready(function()
+ {
+  $('#add').click(function(){
+    var count = 4;
+    count += 1
+    // numeric id #4 below corresponds to the paragraph input field.
+    $('#4').clone().appendTo('.repeatable').attr('id', count)
+  });
+});
+</script>
+
+{% endblock %}
