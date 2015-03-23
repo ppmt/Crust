@@ -1,0 +1,29 @@
+<!-- extend from base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+  <form action="" method="post" name="addIngredient">
+      {{ form.hidden_tag() }}
+      <p>
+        Ingredient: {{ form.ingredient }}<br>
+        Category:   {{ form.category }}<br>
+        Supplier:   {{ form.supplier }}<br>
+        Size of the bag: {{ form.bag_size }}<br>
+        Unit: {{ form.unit }}<br>
+        Cost of the bag: {{ form.bag_cost }}<br>
+        Purchase date: {{ form.purchaseDate }}<br>
+        {% for error in form.errors %}
+          <span style="color: red;">The field [{{ error }}] is incorrect<br> {{ form.category.data }} {{ form.supplier.data }}</span>
+        {% endfor %}
+      </p>
+
+      <p>
+        <input class="btn btn-default" type="submit" name= "btn" value={{ action }}>
+        {% if action=="Update" %}
+          <input class="btn btn-default" type="submit" name= "btn" value="Delete">
+        {% endif %}
+      </p>
+
+  </form>
+{% endblock %}
