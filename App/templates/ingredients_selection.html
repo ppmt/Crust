@@ -1,0 +1,124 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>In this section you will select the ingredient that will be the base of the recipe</p>
+<form class="form form-inline" method="post" name="list_of_ingredient">
+  {{ form.hidden_tag() }}
+    <fieldset class="clonable">
+      {% for ingredient in form.ingredient_list %}
+        {{ wtf.form_field(ingredient.category) }}
+        {{ wtf.form_field(ingredient.ingredient) }}
+      <!--
+        {{ wtf.form_field(ingredient.supplier) }}
+      -->
+      {% endfor %}
+    </p>
+    </fieldset>
+    <div id="formbuttons" class="regrow">
+        <input type="button" class="button" id="clonetrigger" value="Clone" />
+        <input type="submit" value="Submit" />
+    </div>
+    <div id="extra_test" >
+    </div>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script type="text/javascript">
+
+      $(document).ready(function(){
+
+  //The jQuery Setup
+        //TODO : indentify the number in #ingredient_list-0-category and send it as data
+        //$('#ingredient_list-2-category').on('change',function() {
+        $('#ingredient_list-0-category').on('change',function() {
+          $.getJSON("/ingredients_selection",
+                    $('#ingredient_list-0-category'),
+                    function(data) {
+                                    //alert("hello" + data.result.Rye)
+                                    $('#ingredient_list-0-ingredient').empty();
+                                    $.each( data.result, function( key, val )
+                                     {
+                                      $('#ingredient_list-0-ingredient').append($('<option>', {'value': val, 'text': key }));
+                                     });
+                                   }
+                   );
+            });
+
+
+  //Section for the cloning
+          $("#clonetrigger").on('click',function(){
+              var yourclass=".clonable"; //The class you have used in your form
+              var clonecount = $(yourclass).length-1; //how many clones do we already have? was 0 but changed it to -1 to avoid jumping from 0 to 2
+              var newid = Number(clonecount) + 1; //Id of the new clone
+              //alert( newid);
+
+              $(yourclass+":first").fieldclone({//Clone the original element
+                  newid_: newid, //Id of the new clone, (you can pass your own if you want)
+                  target_: $("#formbuttons"), //where do we insert the clone? (target element)
+                  insert_: "before", //where do we insert the clone? (after/before/append/prepend...)
+                  limit_: 9 //Maximum Number of Clones
+              });
+          });
+
+      });
+
+      (function($) {
+
+          $.fn.fieldclone = function(options) {
+
+          //==> Options <==//
+          var settings = {
+            newid_ : 0,
+            target_: $(this),
+            insert_: "before",
+            limit_: 0
+          };
+              if (options) $.extend(settings, options);
+          //alert(settings.newid_);
+          if( (settings.newid_ <= (settings.limit_)) || (settings.limit_==0) ){	//Check the limit to see if we can clone
+
+            //==> Clone <==//
+            var fieldclone = $(this).clone();
+            //alert (fieldclone);
+            var node = $(this)[0].nodeName;
+            var classes = $(this).attr("class");
+
+            //==> Increment every input id <==//
+            var srcid = 0;
+            $(fieldclone).find(':input').each(function(){
+              var s = $(this).attr("name");
+              $(this).attr("name", s.replace(eval('/-'+srcid+'/ig'),'-'+settings.newid_));
+              $(this).attr("id", s.replace(eval('/-'+srcid+'/ig'),'-'+settings.newid_));
+
+              //alert( s.replace(eval('/-'+srcid+'/ig'),'-'+settings.newid_));
+            });
+
+            //==> Locate Target Id <==//
+
+            var targetid = $(settings.target_).attr("id");
+            //alert (targetid);
+            if(targetid.length<=0){
+              targetid = "clonetarget";
+              $(settings.target_).attr("id",targetid);
+            }
+
+            //==> Insert Clone <==//
+            var newhtml = $(fieldclone).html().replace(/\n/gi,"");
+            newhtml = '<'+node+' class="'+classes+'">'+newhtml+'</'+node+'>';
+            //alert(newhtml);
+            eval("var insertCall = $('#"+targetid+"')."+settings.insert_+"(newhtml)");
+          }
+          };
+
+
+      })(jQuery);
+
+  </script>
+
+{% endblock %}
