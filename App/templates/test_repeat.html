@@ -4,17 +4,32 @@
 
 {% block content %}
 
-<div class="container">
-
-  <form class="form form-vertical" method="post" role="form">
+<form class="form form-inline" method="post" >
     {{ form.hidden_tag() }}
-    <div class="repeatable">
-      <span class="add btn btn-success" id="add">Add Paragraph</span>
-      {{ wtf.form_field(form.paragraph) }}
+    <fieldset class="clonable">
+      {% for ingredient in form.ingredient_list %}
+        {{ wtf.form_field(ingredient.category) }}
+        {{ wtf.form_field(ingredient.ingredient) }}
+        {{ wtf.form_field(ingredient.supplier) }}
+      {% endfor %}
+    </p>
+        <!-- <legend>User Details</legend>
+            <div class="regrow">
+p                <label>First Name:</label>
+                <input type="text" name="fname_1" />
+            </div>
+            <div>
+                <label>Last Name:</label>
+                <input type="text" name="lname_1" />
+            </div> -->
+    </fieldset>
+
+    <div id="formbuttons" class="regrow">
+        <input type="button" class="button" id="clonetrigger" value="Clone" />
+        <input type="submit" value="Submit" />
     </div>
-    {{ wtf.form_field(form.submit) }}
-  </form>
-</div>
+
+</form>
 
 {% endblock %}
 
@@ -22,20 +37,72 @@
   {{ super() }}
 
   <script type="text/javascript">
-    jQuery(document).ready(
-      function()
-        {
-          var count = 4;
-          $('#add').click(
-            function()
-            {
-              count += 1
-              // numeric id #4 below corresponds to the paragraph input field.
-              $('#4').clone().appendTo('.repeatable').attr('id', count)
+      //The jQuery Setup
+      $(document).ready(function(){
+
+          $("#clonetrigger").on('click',function(){
+              var yourclass=".clonable"; //The class you have used in your form
+              var clonecount = $(yourclass).length; //how many clones do we already have?
+              var newid = Number(clonecount) + 1; //Id of the new clone
+              //alert(clonecount);
+
+              $(yourclass+":first").fieldclone({//Clone the original elelement
+                  newid_: newid, //Id of the new clone, (you can pass your own if you want)
+                  target_: $("#formbuttons"), //where do we insert the clone? (target element)
+                  insert_: "before", //where do we insert the clone? (after/before/append/prepend...)
+                  limit_: 9 //Maximum Number of Clones
+              });
+          });
+
+      });
+
+      (function($) {
+
+          $.fn.fieldclone = function(options) {
+
+          //==> Options <==//
+          var settings = {
+            newid_ : 0,
+            target_: $(this),
+            insert_: "before",
+            limit_: 0
+          };
+              if (options) $.extend(settings, options);
+
+          if( (settings.newid_ <= (settings.limit_+1)) || (settings.limit_==0) ){	//Check the limit to see if we can clone
+
+            //==> Clone <==//
+            var fieldclone = $(this).clone();
+            var node = $(this)[0].nodeName;
+            var classes = $(this).attr("class");
+
+            //==> Increment every input id <==//
+            var srcid = 0;
+            $(fieldclone).find(':input').each(function(){
+              var s = $(this).attr("name");
+              $(this).attr("name", s.replace(eval('/-'+srcid+'/ig'),'-'+settings.newid_));
+            });
+
+
+
+            //==> Locate Target Id <==//
+
+            var targetid = $(settings.target_).attr("id");
+            if(targetid.length<=0){
+              targetid = "clonetarget";
+              $(settings.target_).attr("id",targetid);
             }
-            );
-        }
-        );
+
+            //==> Insert Clone <==//
+            var newhtml = $(fieldclone).html().replace(/\n/gi,"");
+            newhtml = '<'+node+' class="'+classes+'">'+newhtml+'</'+node+'>';
+
+            eval("var insertCall = $('#"+targetid+"')."+settings.insert_+"(newhtml)");
+          }
+          };
+
+      })(jQuery);
+
   </script>
 
 {% endblock %}
