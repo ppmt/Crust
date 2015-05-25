@@ -21,11 +21,17 @@ class Ingredientlist(db.Model):
 
     @staticmethod
     def CostPerUnit(bag_size, bag_cost):
-        return bag_cost/bag_size 
+        return bag_cost/bag_size
 
-    def __repr__(self):
-        return '<Ingredient %r>' % (self.ingredient)
+    def __repr__(self):   # return id of ingredient
+        results = self.ingredient + ':' + str(self.id)
+        return results
 
+    ##TODO define a function that will create a dictionnary with the key being a category
+    ##     and the value a list of ingredient that have that category
+    def GetIngredientbyCategoty():
+
+        return True
 
 class Categorylist(db.Model):
     # Definition of the models

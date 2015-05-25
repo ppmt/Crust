@@ -1,8 +1,8 @@
-from flask import render_template, flash, redirect, session, url_for, request, g, render_template_string
+from flask import render_template, flash, redirect, session, url_for, request, g, render_template_string, request, jsonify
 from App import app, db
 from .models import Ingredientlist, Categorylist, Supplierlist
 from datetime import datetime
-from .forms import AddIngredientForm, EditIngredientForm, AddCategoryForm, IngredientListForm, Release
+from .forms import AddIngredientForm, EditIngredientForm, AddCategoryForm, IngredientListForm
 
 
 @app.errorhandler(404)
@@ -23,14 +23,54 @@ def index():
                            user='Philippe'
                             )
 
-
 @app.route('/ingredients', methods=['GET', 'POST'])
-def ingredient():
+def ingredients_display():
+    #temp try to avoid crash
+    try:
+        ingredients_list
+    except Exception:
+        ingredients_list=[]
+
+    # TODO : once I decided how to store the recipe then read it and display
+    return render_template('ingredient_display.html',
+                            title = 'List of ingredients used in the recipe',
+                            ingredients = ingredients_list)
+
+@app.route('/ingredients_selection', methods=['GET', 'POST'])
+def ingredient_selection():
     form = IngredientListForm()
+    ingredients_list = []
+    if request.is_xhr:
+        #querystring =  request.query_string.split("=")
+        #print querystring
+        form_cat = request.args.get('ingredient_list-0-category')
+        ingredients = Ingredientlist.query.filter_by(category_id=form_cat).all()
+        #print ingredients
+        tmp = dict()
+        for ingredient in  ingredients:
+            ingredient= str(ingredient).split(':')
+            #print ingredient.split(':')
+            tmp[ingredient[0]] = ingredient[1]
+        print tmp
+        return jsonify(result=tmp)
+        #return jsonify({'stuff': "Hello World" })
+
     if form.validate_on_submit():
-        pass
-        return redirect(url_for('database'))
-    return render_template("ingredients.html",
+        #Return a dictionnary in the form of :
+        #    {'ingredient_list':
+        #        [{'category': Flour - Grain, 'supplier': None, 'ingredient': u'test1'}, {'category': Flour - Grain, 'supplier': None, 'ingredient': u'test2'}]
+        #    }
+
+        #remove potential duplicate
+        for i in form.data['ingredient_list']:
+            if i not in ingredients_list:
+                ingredients_list.append(i)
+        print ingredients_list  # this is a list of dictionnary
+
+        # TODO : read the list and store it in a table ? or a dictionary ? or soemthing else?
+        return redirect(url_for('ingredients_display'))
+
+    return render_template("ingredients_selection.html",
                             action = 'Save',
                             title='List of Ingredients',
                             form = form
@@ -39,17 +79,12 @@ def ingredient():
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    form = Release()
-    if form.validate_on_submit():
-        # this generates the word doc
-        document = Document()
-        document.add_paragraph(form.paragraph.data)
-        f = StringIO()
-        document.save(f)
-        length = f.tell()
-        f.seek(0)
-        return redirect(url_for('database'))
-    return render_template('test_repeat.html', form=form)
+
+    systems = {
+        'PlayStation': [['Spyro',1], ['Crash',2], ['Ico',3]],
+        'N64': [['Mario',1], ['Superman',2]]
+    }
+    return render_template('ingredient_test.html', systems=systems)
 
 
 @app.route('/recipe', methods=['GET', 'POST'])
