@@ -1,0 +1,146 @@
+<!-- extend base layout -->
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+
+<div class="container">
+
+  <form>
+      <select id="system">
+          <option>
+          </option>
+      </select>
+      <select id="game"></select>
+      <select id="supplier"></select>
+      <button type="submit">Play</button>
+  </form>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+  {{ super() }}
+
+<script type="text/javascript">
+"use strict";
+
+//For the filtering of choice based on categories
+var systems = {{ systems|tojson }};
+
+var form = $('form');
+var system = $('select#system');
+var game = $('select#game');
+var supplier = $('select#supplier');
+
+for (var key in systems) {
+    system.append($('<option>', {'value': key, 'text': key}));
+}
+
+system.change(function(ev) {
+    game.empty();
+    game.append($('<option/>'));
+
+    var games = systems[system.val()];
+
+    for (var i in games) {
+        game.append($('<option>', {'value': games[i][0], 'text': games[i][0]}));
+    }
+  });
+
+game.change(function(ev) {
+    var games = systems[system.val()];
+    supplier.empty();
+    supplier.append($('<option>'));
+
+    //var suppliers = systems[game.val()];
+    //alert (game.val());
+    for (var i in games) {
+      //alert(games[i][0]);
+      if (games[i][0] == game.val()){
+        //alert("Bingo"+games[i][1]);
+        supplier.append($('<option>', {'value': games[i][1], 'text': games[i][1]}));
+      }
+    }
+   });
+
+form.submit(function(ev) {
+    ev.preventDefault();
+    alert("playing " + game.val() + " on " + system.val());
+});
+
+
+//For the cloning part
+//The jQuery Setup
+$(document).ready(function(){
+
+    $("#clonetrigger").on('click',function(){
+        var yourclass=".clonable"; //The class you have used in your form
+        var clonecount = $(yourclass).length; //how many clones do we already have?
+        var newid = Number(clonecount) + 1; //Id of the new clone
+        //alert(clonecount);
+
+        $(yourclass+":first").fieldclone({//Clone the original elelement
+            newid_: newid, //Id of the new clone, (you can pass your own if you want)
+            target_: $("#formbuttons"), //where do we insert the clone? (target element)
+            insert_: "before", //where do we insert the clone? (after/before/append/prepend...)
+            limit_: 9 //Maximum Number of Clones
+        });
+    });
+
+});
+
+(function($) {
+
+    $.fn.fieldclone = function(options) {
+
+    //==> Options <==//
+    var settings = {
+      newid_ : 0,
+      target_: $(this),
+      insert_: "before",
+      limit_: 0
+    };
+        if (options) $.extend(settings, options);
+
+    if( (settings.newid_ <= (settings.limit_+1)) || (settings.limit_==0) ){	//Check the limit to see if we can clone
+
+      //==> Clone <==//
+      var fieldclone = $(this).clone();
+      var node = $(this)[0].nodeName;
+      var classes = $(this).attr("class");
+
+      //==> Increment every input id <==//
+      var srcid = 0;
+      $(fieldclone).find(':input').each(function(){
+        var s = $(this).attr("name");
+        $(this).attr("name", s.replace(eval('/-'+srcid+'/ig'),'-'+settings.newid_));
+      });
+
+
+
+      //==> Locate Target Id <==//
+
+      var targetid = $(settings.target_).attr("id");
+      if(targetid.length<=0){
+        targetid = "clonetarget";
+        $(settings.target_).attr("id",targetid);
+      }
+
+      //==> Insert Clone <==//
+      var newhtml = $(fieldclone).html().replace(/\n/gi,"");
+      newhtml = '<'+node+' class="'+classes+'">'+newhtml+'</'+node+'>';
+
+      eval("var insertCall = $('#"+targetid+"')."+settings.insert_+"(newhtml)");
+    }
+    };
+
+})(jQuery);
+
+
+</script>
+{% endblock %}
