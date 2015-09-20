@@ -19,9 +19,6 @@ MAIL_SERVER = 'smtp.googlemail.com'
 MAIL_PORT = 465
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
-# had to remove the os.environ.get to get it to work
-#MAIL_USERNAME = os.environ.get('philippe@ppmt.org')
-#MAIL_PASSWORD = os.environ.get('2205mat')
 MAIL_USERNAME = 'your email'
 MAIL_PASSWORD = 'your password'
 # administrator list
