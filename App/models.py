@@ -6,10 +6,6 @@ class Ingredientlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ingredient = db.Column(db.String(64), index=True, unique=True)
     category_id = db.Column(db.Integer, db.ForeignKey('categorylist.id'))
-    ## below needs to be moved to Categorylist....it could list all the ingredient under one category
-    ## At least this is how I understant relationship
-    #category = db.relationship('Categorylist', backref='category', lazy='dynamic')
-
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplierlist.id'))
     bag_size = db.Column(db.Float, index=False, unique=False)
     bag_cost = db.Column(db.Float, index=False, unique=False)
@@ -23,13 +19,19 @@ class Ingredientlist(db.Model):
     def CostPerUnit(bag_size, bag_cost):
         return bag_cost/bag_size
 
+    @staticmethod
+    def GetIngID(Ingredient):
+        ing = Ingredientlist.query.filter_by(ingredient=Ingredient).first()
+        return ing.id
+
     def __repr__(self):   # return id of ingredient
-        results = self.ingredient + ':' + str(self.id)
+        #results = self.ingredient + ':' + str(self.id)
+        results = self.ingredient
         return results
 
     ##TODO define a function that will create a dictionnary with the key being a category
     ##     and the value a list of ingredient that have that category
-    def GetIngredientbyCategoty():
+    def GetIngredientbyCategory():
 
         return True
 
@@ -64,7 +66,7 @@ class Supplierlist(db.Model):
     suppliers = db.relationship('Ingredientlist', backref='supplier')
 
     @staticmethod
-    def GetCatID(Supplier):
+    def GetSupID(Supplier):
         if Supplier=='None':
             return ""
         cat = Supplierlist.query.filter_by(supplier=Supplier).first()
@@ -73,3 +75,11 @@ class Supplierlist(db.Model):
     def __repr__(self):
         #return '<Supplier %r>' % (self.supplier)
         return self.supplier # same as for category
+
+
+#class RecipeIngredient(db.Model):
+    # Definition of the models
+    #Not sure how to store my list of ingredient
+    #I need to obviously store the ingredient_id from Ingredientlist.
+    #That might be enough since from the ingredient_id I know the rest...
+    #

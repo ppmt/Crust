@@ -47,7 +47,7 @@ class IngredientListTemplate(Form):
     category = QuerySelectField(query_factory=categorylist, get_label=u'category', allow_blank=False)
     #ingredient = StringField( validators=[DataRequired()])
     ingredient = QuerySelectField(query_factory=ingredientlist, get_label=u'ingredient', allow_blank=False)
-    supplier = QuerySelectField(query_factory=supplierlist, get_label=u'supplier', allow_blank=True, blank_text=u'Choose an optional Supplier',validators=[Optional()])
+    #supplier = QuerySelectField(query_factory=supplierlist, get_label=u'supplier', allow_blank=True, blank_text=u'Choose an optional Supplier',validators=[Optional()])
 
     #No idea what it is for but it removes the CSRF token missing
     def __init__(self, *args, **kwargs):

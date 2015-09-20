@@ -41,19 +41,14 @@ def ingredient_selection():
     form = IngredientListForm()
     ingredients_list = []
     if request.is_xhr:
-        #querystring =  request.query_string.split("=")
-        #print querystring
-        form_cat = request.args.get('ingredient_list-0-category')
+        key = list(request.args.keys())[0] #extract the item that was clicked
+        form_cat = request.args.get(key) #get the value chosen
         ingredients = Ingredientlist.query.filter_by(category_id=form_cat).all()
-        #print ingredients
-        tmp = dict()
+        result = dict()
         for ingredient in  ingredients:
-            ingredient= str(ingredient).split(':')
-            #print ingredient.split(':')
-            tmp[ingredient[0]] = ingredient[1]
-        print tmp
-        return jsonify(result=tmp)
-        #return jsonify({'stuff': "Hello World" })
+            result[str(ingredient)] = Ingredientlist.GetIngID(str(ingredient))
+        #print tmp
+        return jsonify(result=result) # return a list of ingredient with their id for the clicked category
 
     if form.validate_on_submit():
         #Return a dictionnary in the form of :
@@ -65,7 +60,10 @@ def ingredient_selection():
         for i in form.data['ingredient_list']:
             if i not in ingredients_list:
                 ingredients_list.append(i)
-        print ingredients_list  # this is a list of dictionnary
+        #print ingredients_list  # this is a list of dictionnary
+
+        for ingredient in ingredients_list:
+            print ingredient['category']
 
         # TODO : read the list and store it in a table ? or a dictionary ? or soemthing else?
         return redirect(url_for('ingredients_display'))
@@ -116,11 +114,11 @@ def add_ingredient():
 
             #Commit item to database (no check for the moment)
             #I will want to verify that it is not a doublon or things like that
-
+            print form.category
             # Prepare insertion
             item = Ingredientlist(  ingredient = form.ingredient.data,
                                     category_id = Categorylist.GetCatID(str(form.category.data)),  # need to convert to string to make it work!
-                                    supplier_id = Supplierlist.GetCatID(str(form.supplier.data)),
+                                    supplier_id = Supplierlist.GetSupID(str(form.supplier.data)),
                                     bag_size = form.bag_size.data,
                                     bag_cost = form.bag_cost.data,
                                     unit = form.unit.data, ## look if really needed
