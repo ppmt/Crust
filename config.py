@@ -22,10 +22,10 @@ MAIL_USE_SSL = True
 # had to remove the os.environ.get to get it to work
 #MAIL_USERNAME = os.environ.get('philippe@ppmt.org')
 #MAIL_PASSWORD = os.environ.get('2205mat')
-MAIL_USERNAME = 'philippe@ppmt.org'
-MAIL_PASSWORD = '2205mat'
+MAIL_USERNAME = 'your email'
+MAIL_PASSWORD = 'your password'
 # administrator list
-ADMINS = ['philippe@ppmt.org']
+ADMINS = ['your email']
 
 # pagination
 POSTS_PER_PAGE = 3
@@ -41,3 +41,4 @@ OPENID_PROVIDERS = [
     {'name': 'AOL', 'url': 'http://openid.aol.com/<username>'},
     {'name': 'Flickr', 'url': 'http://www.flickr.com/<username>'},
     {'name': 'MyOpenID', 'url': 'https://www.myopenid.com'}]
+
