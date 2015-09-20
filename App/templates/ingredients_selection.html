@@ -11,18 +11,12 @@
       {% for ingredient in form.ingredient_list %}
         {{ wtf.form_field(ingredient.category) }}
         {{ wtf.form_field(ingredient.ingredient) }}
-      <!--
-        {{ wtf.form_field(ingredient.supplier) }}
-      -->
       {% endfor %}
     </p>
     </fieldset>
     <div id="formbuttons" class="regrow">
         <input type="button" class="button" id="clonetrigger" value="Clone" />
         <input type="submit" value="Submit" />
-    </div>
-    <div id="extra_test" >
-    </div>
 </form>
 
 {% endblock %}
@@ -32,22 +26,27 @@
   <script type="text/javascript">
 
       $(document).ready(function(){
+        $('form').click(function(event) {
+                myid = event.target.id; //get the id of the event
+                if (myid.indexOf("category") !=-1) { //Are we clicking on a category (if not ignore)
+                  console.log(myid);
+                  ing_target = myid.replace('-category','-ingredient');
+                  //Lets pack the XHR request
+                  $('form').on('change','#'+myid,function() {
+                    $.getJSON("/ingredients_selection",
+                              $('#'+myid),
+                              function(data) {
+                                //$('#ingredient_list-1-ingredient').empty();
+                                $('#'+ing_target).empty();
+                                $.each( data.result, function( key, val ) {
+                                  //$('#ingredient_list-1-ingredient').append($('<option>', {'value': val, 'text': key }));
+                                  $('#'+ing_target).append($('<option>', {'value': val, 'text': key }));
+                                               });
+                                             }
+                             );
+                      });
 
-  //The jQuery Setup
-        //TODO : indentify the number in #ingredient_list-0-category and send it as data
-        //$('#ingredient_list-2-category').on('change',function() {
-        $('#ingredient_list-0-category').on('change',function() {
-          $.getJSON("/ingredients_selection",
-                    $('#ingredient_list-0-category'),
-                    function(data) {
-                                    //alert("hello" + data.result.Rye)
-                                    $('#ingredient_list-0-ingredient').empty();
-                                    $.each( data.result, function( key, val )
-                                     {
-                                      $('#ingredient_list-0-ingredient').append($('<option>', {'value': val, 'text': key }));
-                                     });
-                                   }
-                   );
+              };
             });
 
 
